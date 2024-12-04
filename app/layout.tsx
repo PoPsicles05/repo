@@ -1,31 +1,41 @@
-import './globals.css'
-import { Inter } from 'next/font/google'
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
-import { ToastProvider } from "@/components/ui/toast"
+'use client'
 
-const inter = Inter({ subsets: ['latin'] })
-
-export const metadata = {
-  title: 'Hospital Management System',
-  description: 'A comprehensive hospital management system',
-}
+import { useEffect, useState } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+  const pathname = usePathname()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setIsAuthenticated(!!user)
+      setIsLoading(false)
+
+      if (!user && pathname !== '/') {
+        router.push('/')
+      }
+    }
+
+    checkAuth()
+  }, [pathname, router])
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <ToastProvider>
-          <div className="flex flex-col min-h-screen">
-            <Header />
-            <main className="flex-grow">{children}</main>
-            <Footer />
-          </div>
-        </ToastProvider>
+      <body>
+        {isAuthenticated || pathname === '/' ? children : null}
       </body>
     </html>
   )
