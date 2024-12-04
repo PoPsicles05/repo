@@ -1,3 +1,6 @@
+// use client
+import { useState, useEffect } from 'react';
+// ... rest of your imports
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
